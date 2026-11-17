@@ -1,4 +1,5 @@
 import { elapsedSeconds, formatElapsed } from "./api.js";
+import { engineOfModel, EXECUTORS } from "./engines.js";
 
 export const NOT_REPORTED = "未上报";
 
@@ -62,6 +63,8 @@ const tokenParts = [
 export function messageInfo(message = {}) {
   const seconds = elapsedSeconds(message.startedAt, message.createdAt);
   const model = String(message.model || "").trim();
+  const engine = engineOfModel(model);
+  const tool = EXECUTORS.find(({ id }) => id === engine)?.label ?? "CodeBuddy";
   const rows = [
     {
       key: "time",
@@ -73,7 +76,7 @@ export function messageInfo(message = {}) {
       label: "Agent",
       value: String(message.speakerName || "").trim() || "主 Bot",
     },
-    { key: "tool", label: "编码工具", value: "CodeBuddy" },
+    { key: "tool", label: "编码工具", value: tool },
     { key: "model", label: "模型", value: model || NOT_REPORTED },
     {
       key: "elapsed",

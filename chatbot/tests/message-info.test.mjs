@@ -47,6 +47,14 @@ test("new replies show model, elapsed time and token totals", () => {
   );
 });
 
+test("reply statistics name the CLI identified by the saved model", () => {
+  const info = messageInfo({ model: "dsh:deepseek-flash" });
+  assert.equal(row(info, "tool").value, "DeepSeek Harness");
+  assert.equal(row(info, "model").value, "dsh:deepseek-flash");
+  assert.equal(row(messageInfo({ model: "codex:gpt-5.4" }), "tool").value, "Codex");
+  assert.equal(row(messageInfo({ model: "deepseek:free" }), "tool").value, "CodeBuddy");
+});
+
 test("legacy replies fall back to 「未上报」 without token details", () => {
   const info = messageInfo({
     createdAt: "2026-10-31T03:52:48",
