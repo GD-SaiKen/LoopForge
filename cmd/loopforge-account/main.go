@@ -16,7 +16,14 @@ import (
 func main() {
 	login := flag.String("user", "", "account login")
 	admin := flag.Bool("admin", false, "grant platform administration")
+	bootstrap := flag.Bool("bootstrap-admin", false, "create the initial administrator without replacing an existing password")
 	flag.Parse()
+	if *bootstrap {
+		if *login != "" || *admin {
+			log.Fatal("bootstrap-admin cannot be combined with user or admin")
+		}
+		*login = "admin"
+	}
 	if *login == "" || len(*login) > 64 || strings.ContainsAny(*login, " \t\r\n") {
 		log.Fatal("a login of 1–64 characters without spaces is required")
 	}
@@ -33,6 +40,13 @@ func main() {
 		log.Fatal(err)
 	}
 	defer s.Close()
+	if *bootstrap {
+		if _, err := s.BootstrapLocalAdmin(password); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Administrator is ready.")
+		return
+	}
 	if err := s.PutUser(domain.User{LoginName: *login, ChineseName: *login}); err != nil {
 		log.Fatal(err)
 	}
