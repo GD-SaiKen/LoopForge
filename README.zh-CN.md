@@ -83,6 +83,23 @@ cd LoopForge
 
 国内拉取 `ghcr.io` 经常中断。把 `MIRROR` 设成可以替换 `ghcr.io` 的镜像站主机名，`./start.sh` 会用它拉取，再改回 `compose.yaml` 里的原名。设置 `MIRROR` 表示信任该主机，因为下载结果会被标成官方镜像名。发布说明里有 digest，可用 `docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/tencent/loopforge:<pin>` 核对，`@` 后面的摘要应一致。不设置时仍直接从 `ghcr.io` 拉取。`compose.yaml` 不用改。升级时带上同一个变量执行 `./start.sh pull`。南京大学的 GHCR 镜像站是 [ghcr.nju.edu.cn](https://doc.nju.edu.cn/books/e1654/page/ghcr)。Docker 引擎里的 `registry-mirrors`（包括 `https://docker.nju.edu.cn`）只加速 Docker Hub，不能填在这里。
 
+**Docker Hub 国内镜像（全局）**：`compose.yaml` 里的 `mysql:8.4` 走 Docker Hub。可用仓库内脚本写入引擎配置（列表见 `scripts/docker-registry-mirrors.defaults.json`）：
+
+```powershell
+# Windows / Docker Desktop
+.\scripts\configure-docker-registry-mirrors.ps1
+# 可选：阿里云专属加速地址（控制台 → 镜像加速器）
+$env:LOOPFORGE_DOCKER_MIRROR_ALIYUN = "https://xxxx.mirror.aliyuncs.com"
+.\scripts\configure-docker-registry-mirrors.ps1
+```
+
+```bash
+# Linux / macOS Docker Desktop
+bash scripts/configure-docker-registry-mirrors.sh
+```
+
+配置后重启 Docker，用 `docker info` 查看 `Registry Mirrors`。平台镜像仍用下面的 `MIRROR` 或 `LOOPFORGE_IMAGE`。
+
 ```bash
 MIRROR=ghcr.nju.edu.cn ./start.sh
 ```

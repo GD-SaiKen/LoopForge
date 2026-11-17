@@ -51,6 +51,8 @@ The new `compose.yaml` brings the image pin and any new platform settings togeth
 
 Where `ghcr.io` downloads stall, set `MIRROR` to the registry host that replaces `ghcr.io`. `./start.sh` and `./start.sh pull` pull that reference and tag it back to the name in `compose.yaml`. Setting `MIRROR` trusts that host, because the result is tagged with the official name. The GitHub Release records the image digest; `docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/tencent/loopforge:<pin>` should show the same digest after `@`. The pull policy stays `missing` on install, so a local image is kept; `./start.sh pull` refreshes it from the same host. Leaving `MIRROR` unset preserves the direct `ghcr.io` pull. [ghcr.nju.edu.cn](https://doc.nju.edu.cn/books/e1654/page/ghcr) is one compatible host. Docker's `registry-mirrors` setting, including `https://docker.nju.edu.cn`, only applies to Docker Hub and cannot be used as `MIRROR`. A `LOOPFORGE_IMAGE` value that is not a `ghcr.io` name:tag is left unchanged.
 
+For Docker Hub pulls in the stack (`mysql:8.4`), apply the repository defaults with `scripts/configure-docker-registry-mirrors.ps1` (Windows Docker Desktop) or `scripts/configure-docker-registry-mirrors.sh` (Linux `/etc/docker` or `~/.docker`). Mirrors are listed in `scripts/docker-registry-mirrors.defaults.json`; set `LOOPFORGE_DOCKER_MIRROR_ALIYUN` to prepend an Aliyun accelerator URL from the Aliyun container registry console. Restart Docker after changing the engine config.
+
 ```bash
 MIRROR=ghcr.nju.edu.cn ./start.sh
 MIRROR=ghcr.nju.edu.cn ./start.sh pull
